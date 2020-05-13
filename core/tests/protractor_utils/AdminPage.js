@@ -106,27 +106,27 @@ var AdminPage = function() {
     };
   }
 
-  var saveConfigProperty = function(
+  var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
-    return configProperty.element(by.css('.protractor-test-config-title'))
-      .getText()
-      .then(function(title) {
-        if (title.match(propertyName)) {
-          editingInstructions(forms.getEditor(objectType)(configProperty));
-          saveAllConfigs.click();
-          general.acceptAlert();
-          // Waiting for success message.
-          waitFor.textToBePresentInElement(
-            statusMessage, 'saved successfully',
-            'New config could not be saved');
-          return true;
-        }
-      });
+    title = await configProperty.element(
+      by.css('.protractor-test-config-title')
+    ).getText();
+    if (title.match(propertyName)) {
+      await editingInstructions(
+        await forms.getEditor(objectType)(configProperty));
+      await saveAllConfigs.click();
+      await general.acceptAlert();
+      // Waiting for success message.
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'saved successfully',
+        'New config could not be saved');
+      return true;
+    }
   };
 
-  this.get = function() {
-    browser.get(ADMIN_URL_SUFFIX);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(ADMIN_URL_SUFFIX);
+    //await waitFor.pageToFullyLoad();
   };
 
   this.getJobsTab = function() {
@@ -134,23 +134,30 @@ var AdminPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.editConfigProperty = function(
+  this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
-    this.get();
-    configTab.click();
-    waitFor.elementToBeClickable(saveAllConfigs);
-    configProperties.map(function(x) {
-      return saveConfigProperty(
-        x, propertyName, objectType, editingInstructions);
-    }).then(function(results) {
-      var success = null;
-      for (var i = 0; i < results.length; i++) {
-        success = success || results[i];
-      }
-      if (!success) {
-        throw new Error('Could not find config property: ' + propertyName);
-      }
-    });
+    await this.get();
+    /*
+    await configTab.click();
+    await waitFor.elementToBeClickable(saveAllConfigs);
+    // DEBUG Broken above this
+    results = await Promise.all(
+      configProperties.map(
+        async function(x) {
+          return await saveConfigProperty(
+            x, propertyName, objectType, editingInstructions
+          );
+        }
+      )
+    );
+    var success = null;
+    for (var i = 0; i < results.length; i++) {
+      success = success || results[i];
+    }
+    if (!success) {
+      throw new Error('Could not find config property: ' + propertyName);
+    }
+    */
   };
 
   this.startOneOffJob = function(jobName) {

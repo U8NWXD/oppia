@@ -266,7 +266,7 @@ exports.config = {
   // before the specs are executed
   // You can specify a file containing code to run by setting onPrepare to
   // the filename string.
-  onPrepare: function() {
+  onPrepare: async function() {
     browser.isMobile = false;
     // At this point, global 'protractor' object will be set up, and jasmine
     // will be available. For example, you can add a Jasmine reporter with:
@@ -295,14 +295,14 @@ exports.config = {
     }
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-    jasmine.getEnv().addReporter(new SpecReporter({
+    await jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'pretty',
       displaySpecDuration: true
     }));
 
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
-    browser.driver.manage().window().setSize(1285, 1000);
+    await browser.driver.manage().window().setSize(1285, 1000);
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -323,6 +323,9 @@ exports.config = {
   // Mocha has limited beta support. You will need to include your own
   // assertion framework if working with mocha.
   framework: 'jasmine2',
+
+  // Use async-await instead of the built-in promise manager
+  SELENIUM_PROMISE_MANAGER: false,
 
   // ----- Options to be passed to minijasminenode -----
   //
