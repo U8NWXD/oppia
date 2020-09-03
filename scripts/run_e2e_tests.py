@@ -27,8 +27,8 @@ import subprocess
 import sys
 import time
 
-from googleapiclient.discovery import build as gacbuild
 from google.oauth2 import service_account
+from googleapiclient.discovery import build as gacbuild
 import python_utils
 from scripts import build
 from scripts import common
@@ -46,6 +46,9 @@ PROTRACTOR_BIN_PATH = os.path.join(
 PORTSERVER_SOCKET_FILEPATH = os.path.join(
     os.getcwd(), 'portserver.socket')
 KILL_PORTSERVER_TIMEOUT_SECS = 10
+# We rerun tests if they flake. This is the maximum number of times a
+# test can fail before we stop rerunning it.
+MAXIMUM_RUNS = 3
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
@@ -542,11 +545,22 @@ def cleanup_portserver(portserver_process):
 
 
 def get_flaky_tests_data_from_sheets(sheet):
+    """Get from a Google Sheet the flaky test data.
+
+    Args:
+        sheet: Spreadsheet. The sheet tracking flakes.
+
+    Returns:
+        list(tuple(str, str, int)). A list of 3-tuples. Each tuple
+        represents a flake and stores the test name, the error message,
+        and the number of times the test has flaked this week.
+    """
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
     flaky_tests_list = []
     if sheet_id is not None:
-        result = sheet.values().get(spreadsheetId=sheet_id,
-                                    range='Log!A5:T1000').execute()
+        result = sheet.values().get(
+            spreadsheetId=sheet_id,
+            range='Log!A5:T1000').execute()
         values = result.get('values', [])
 
         for row in values:
@@ -561,6 +575,14 @@ def get_flaky_tests_data_from_sheets(sheet):
 
 
 def update_flaky_tests_count(sheet, row_index, current_count):
+    """Update the count of flaky tests in a Google Sheet.
+
+    Args:
+        sheet: Spreadsheet. The sheet to update.
+        row_index: int. The index of the row of the sheet to update.
+        current_count: int. The number of flakes currently stored in
+            the sheet at the row with index row_index.
+    """
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
     if sheet_id is not None:
         values = [
@@ -570,7 +592,7 @@ def update_flaky_tests_count(sheet, row_index, current_count):
         ]
 
         body = {
-            'values' : values
+            'values': values
         }
 
         sheet.values().update(
@@ -580,7 +602,7 @@ def update_flaky_tests_count(sheet, row_index, current_count):
             body=body).execute()
 
 
-def main(args=None):
+def run_tests(args=None):
     """Run the scripts to start end-to-end tests."""
 
     parsed_args = _PARSER.parse_args(args=args)
@@ -638,9 +660,9 @@ def main(args=None):
     auth_file_url = os.getenv('GOOGLE_SHEETS_AUTH_FILE_URL')
     if auth_file_url is not None:
         subprocess.Popen(['wget', auth_file_url, '-O', 'auth.json']).wait()
-        SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
         creds = service_account.Credentials.from_service_account_file(
-            'auth.json', scopes=SCOPES)
+            'auth.json',
+            scopes=['https://www.googleapis.com/auth/spreadsheets'])
         sheet = gacbuild('sheets', 'v4', credentials=creds).spreadsheets()
 
         flaky_tests_list = get_flaky_tests_data_from_sheets(sheet)
@@ -648,28 +670,35 @@ def main(args=None):
     if len(flaky_tests_list) > 0 and p.returncode != 0:
         for i, line in enumerate(output_lines):
             if line == '*                    Failures                    *':
-                suite = output_lines[i + 3][3 :].strip().lower()
+                suite = output_lines[i + 3][3:].strip().lower()
 
                 # Remove coloring characters.
                 ansi_escape = re.compile(
                     r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-                failure_log = ansi_escape.sub('', output_lines[i+4])
-                failure_log = failure_log[2 :].strip().lower()
+                failure_log = ansi_escape.sub('', output_lines[i + 4])
+                failure_log = failure_log[2:].strip().lower()
                 for index, row in enumerate(flaky_tests_list):
                     flaky_suite_name = row[0].strip().lower()
                     flaky_error_message = row[1].strip().lower()
                     if (
-                        suite == flaky_suite_name or
-                        flaky_error_message == failure_log):
+                            suite == flaky_suite_name or
+                            flaky_error_message == failure_log):
                         update_flaky_tests_count(sheet, index, row[2])
                         try:
                             atexit._run_exitfuncs()
-                        finally:
-                            return 'flake'
+                        except Exception:
+                            pass
+                        return 'flake'
     sys.exit(p.returncode)
 
 
+def main():
+    """Run tests, rerunning at most MAXIMUM_RUNS times if they flake."""
+    for _ in range(MAXIMUM_RUNS):
+        flake_state = run_tests()
+        if flake_state != 'flake':
+            break
+
+
 if __name__ == '__main__':  # pragma: no cover
-    flake_state = main()
-    if flake_state == 'flake':
-        main()
+    main()
