@@ -36,7 +36,7 @@ from scripts import flake_checker
 from scripts import install_third_party_libs
 
 
-MAX_RETRY_COUNT = 3
+MAX_RETRY_COUNT = 1
 RERUN_NON_FLAKY = True
 WEB_DRIVER_PORT = 4444
 OPPIA_SERVER_PORT = 8181
@@ -597,21 +597,6 @@ def main(args=None):
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
         output, return_code = run_tests(parsed_args)
-        # Don't rerun off of CI.
-        if not flake_checker.check_if_on_ci():
-            python_utils.PRINT('No reruns because not running on CI.')
-            break
-        # Don't rerun passing tests.
-        if return_code == 0:
-            flake_checker.report_pass(parsed_args.suite)
-            break
-        flaky = flake_checker.is_test_output_flaky(
-            output, parsed_args.suite)
-        # Don't rerun if the test was non-flaky and we are not
-        # rerunning non-flaky tests.
-        if not flaky and not RERUN_NON_FLAKY:
-            break
-        # Prepare for rerun.
         cleanup()
 
     sys.exit(return_code)
