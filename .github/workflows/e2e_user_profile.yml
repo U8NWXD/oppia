@@ -36,6 +36,9 @@ jobs:
       - name: Run e2e users test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="users" --prod_env
+      - name: DEBUGGING: List video files
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: ls /home/runner/work/oppia/protractor-video
       - name: Uploading protractor-screenshots as Artifacts
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
         uses: actions/upload-artifact@v2
