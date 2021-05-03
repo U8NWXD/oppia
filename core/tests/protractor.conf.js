@@ -372,7 +372,7 @@ exports.config = {
           var name = videoCounter.toString() + '.mp4';
           videoCounter++;
           console.log(result.fullName);
-          var dirPath = path.resolve('__dirname', '..', 'protractor-video/');
+          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
           try {
             fs.mkdirSync(dirPath, { recursive: true });
           } catch (err) {}
