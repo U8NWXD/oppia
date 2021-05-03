@@ -342,7 +342,19 @@ exports.config = {
     // Adding a video reporter. For more information see
     // https://www.npmjs.com/package/protractor-video-reporter
 
-    var ffmpegArguments = [
+    //var ffmpegArguments = [
+    //  '-y',
+    //  '-r', '30',
+    //  '-f', 'x11grab',
+    //  '-s', '1366x768',
+    //  '-i', process.env.DISPLAY,
+    //  '-g', '300',
+    //  '-vcodec', 'qtrle',
+    //];
+
+    var ADD_VIDEO_REPORTER = true;
+    var spw = '';
+    var ffmpegArgs = [
       '-y',
       '-r', '30',
       '-f', 'x11grab',
@@ -350,16 +362,40 @@ exports.config = {
       '-i', process.env.DISPLAY,
       '-g', '300',
       '-vcodec', 'qtrle',
-    ]
+    ];
+    var videoCounter = 0;
 
-    jasmine.getEnv().addReporter(new VideoReporter({
-      baseDirectory: path.resolve(__dirname, '../../../protractor-video'),
-      singleVideo: false,
-      singleVideoPath: 'uuid',
-      saveSuccessVideos: true,
-      ffmpegArgs: ffmpegArguments
-    }));
-    
+    if (ADD_VIDEO_REPORTER) {
+      jasmine.getEnv().addReporter({
+        suiteStarted: function(result){
+          var name = videoCounter.toString() + '.mp4';
+          console.log(result.fullName);
+          var vidPath = path.resolve('__dirname', '../protractor-video/') + name;
+          console.log(vidPath);
+          ffmpegArgs.push(vidPath);
+          console.log(ffmpegArgs);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.stdout.on('data', function(data) {console.log(data);});
+          spw.stderr.on('data', function(data) {console.error(data)});
+          spw.on('close', function(data){console.log(data)});
+        },
+        suiteDone: function() {
+          spw.kill();
+          spw.stdout.on('data', function(data) {console.log(data);});
+          spw.stderr.on('data', function(data) {console.error(data)});
+          spw.on('close', function(data){console.log(data)});
+        }
+      });
+    }
+
+    //jasmine.getEnv().addReporter(new VideoReporter({
+    //  baseDirectory: path.resolve(__dirname, '../../../protractor-video'),
+    //  singleVideo: false,
+    //  singleVideoPath: 'uuid',
+    //  saveSuccessVideos: true,
+    //  ffmpegArgs: ffmpegArguments
+    //}));
+
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'pretty',
