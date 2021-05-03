@@ -370,7 +370,7 @@ exports.config = {
         suiteStarted: function(result){
           var name = videoCounter.toString() + '.mp4';
           console.log(result.fullName);
-          var vidPath = path.resolve('__dirname', '../protractor-video/') + name;
+          var vidPath = path.resolve('__dirname', '../protractor-video/', name);
           console.log(vidPath);
           ffmpegArgs.push(vidPath);
           console.log(ffmpegArgs);
