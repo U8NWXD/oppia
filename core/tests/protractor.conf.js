@@ -3,6 +3,7 @@ var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var VideoReporter = require('protractor-video-reporter');
 var glob = require('glob');
 var path = require('path');
+var fs = require('fs');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
@@ -354,23 +355,28 @@ exports.config = {
 
     var ADD_VIDEO_REPORTER = true;
     var spw = '';
-    var ffmpegArgs = [
-      '-y',
-      '-r', '30',
-      '-f', 'x11grab',
-      '-s', '1366x768',
-      '-i', process.env.DISPLAY,
-      '-g', '300',
-      '-vcodec', 'qtrle',
-    ];
     var videoCounter = 0;
 
     if (ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter({
         suiteStarted: function(result){
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1366x768',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-vcodec', 'qtrle',
+          ];
           var name = videoCounter.toString() + '.mp4';
+          videoCounter++;
           console.log(result.fullName);
-          var vidPath = path.resolve('__dirname', '../protractor-video/', name);
+          var dirPath = path.resolve('__dirname', '..', 'protractor-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          let vidPath = path.resolve(dirPath, name);
           console.log(vidPath);
           ffmpegArgs.push(vidPath);
           console.log(ffmpegArgs);
