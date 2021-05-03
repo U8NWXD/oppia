@@ -359,7 +359,7 @@ exports.config = {
 
     if (ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter({
-        suiteStarted: function(result){
+        specStarted: function(result){
           let ffmpegArgs = [
             '-y',
             '-r', '30',
@@ -377,20 +377,20 @@ exports.config = {
             fs.mkdirSync(dirPath, { recursive: true });
           } catch (err) {}
           let vidPath = path.resolve(dirPath, name);
-          console.log(vidPath);
+          console.log(`Video path: ${vidPath}`);
           ffmpegArgs.push(vidPath);
-          console.log(ffmpegArgs);
+          console.log(`ffmpeg args: ${ffmpegArgs}`);
           spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-          spw.stdout.on('data', function(data) {console.log(data);});
-          spw.stderr.on('data', function(data) {console.error(data)});
-          spw.on('close', function(data){console.log(data)});
+          spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
+          spw.stderr.on('data', function(data) {console.error(`ffmpeg stderr: ${data}`)});
+          spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
+          console.log('Attached spw output handlers');
         },
-        suiteDone: function() {
-          spw.kill();
-          spw.stdout.on('data', function(data) {console.log(data);});
-          spw.stderr.on('data', function(data) {console.error(data)});
-          spw.on('close', function(data){console.log(data)});
-        }
+        specDone: function() {
+          console.log('Killing spw');
+          let success = spw.kill();
+          console.log(`Killing was successful: ${success}`);
+        },
       });
     }
 
