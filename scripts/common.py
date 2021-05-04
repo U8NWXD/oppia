@@ -1029,7 +1029,7 @@ def managed_ffmpeg(video_name):
         os.makedirs(PROTRACTOR_VIDEOS_DIR)
     tokens = [
         'ffmpeg', '-r', '30', '-f', 'x11grab', '-s', '1280x1024', '-i',
-        os.env['DISPLAY'],
+        os.environ['DISPLAY'],
         os.path.join(PROTRACTOR_VIDEOS_DIR, video_name)]
     with managed_process(tokens, shell=True) as proc:
         yield proc
