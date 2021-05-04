@@ -512,7 +512,7 @@ def cleanup_portserver(portserver_process):
     _kill_process(portserver_process)
 
 
-def run_tests(args):
+def run_tests(args, attempt):
     """Run the scripts to start end-to-end tests."""
     oppia_instance_is_already_running = is_oppia_server_already_running()
 
@@ -542,12 +542,15 @@ def run_tests(args):
         port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
         clear_datastore=True, skip_sdk_update_check=True,
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
+    managed_ffmpeg = common.managed_ffmpeg(
+        'e2e_recording_{}.mp4'.format(attempt))
 
     with contextlib2.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
+        stack.enter_context(managed_ffmpeg)
 
         python_utils.PRINT('Waiting for servers to come up...')
 
@@ -596,7 +599,7 @@ def main(args=None):
 
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
-        output, return_code = run_tests(parsed_args)
+        output, return_code = run_tests(parsed_args, attempt_num + 1)
         cleanup()
 
     sys.exit(return_code)

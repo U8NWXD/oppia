@@ -353,46 +353,46 @@ exports.config = {
     //  '-vcodec', 'qtrle',
     //];
 
-    var ADD_VIDEO_REPORTER = true;
-    var spw = '';
-    var videoCounter = 0;
+    //var ADD_VIDEO_REPORTER = true;
+    //var spw = '';
+    //var videoCounter = 0;
 
-    if (ADD_VIDEO_REPORTER) {
-      jasmine.getEnv().addReporter({
-        specStarted: function(result){
-          let ffmpegArgs = [
-            '-y',
-            '-r', '30',
-            '-f', 'x11grab',
-            '-s', '1285x1000',
-            '-i', process.env.DISPLAY,
-            '-g', '300',
-            '-vcodec', 'qtrle',
-          ];
-          var name = videoCounter.toString() + '.mp4';
-          videoCounter++;
-          console.log(result.fullName);
-          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
-          try {
-            fs.mkdirSync(dirPath, { recursive: true });
-          } catch (err) {}
-          let vidPath = path.resolve(dirPath, name);
-          console.log(`Video path: ${vidPath}`);
-          ffmpegArgs.push(vidPath);
-          console.log(`ffmpeg args: ${ffmpegArgs}`);
-          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-          spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
-          spw.stderr.on('data', function(data) {console.error(`ffmpeg stderr: ${data}`)});
-          spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
-          console.log('Attached spw output handlers');
-        },
-        specDone: function() {
-          console.log('Killing spw');
-          let success = spw.kill();
-          console.log(`Killing was successful: ${success}`);
-        },
-      });
-    }
+    //if (ADD_VIDEO_REPORTER) {
+    //  jasmine.getEnv().addReporter({
+    //    specStarted: function(result){
+    //      let ffmpegArgs = [
+    //        '-y',
+    //        '-r', '30',
+    //        '-f', 'x11grab',
+    //        '-s', '1285x1000',
+    //        '-i', process.env.DISPLAY,
+    //        '-g', '300',
+    //        '-vcodec', 'qtrle',
+    //      ];
+    //      var name = videoCounter.toString() + '.mp4';
+    //      videoCounter++;
+    //      console.log(result.fullName);
+    //      var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
+    //      try {
+    //        fs.mkdirSync(dirPath, { recursive: true });
+    //      } catch (err) {}
+    //      let vidPath = path.resolve(dirPath, name);
+    //      console.log(`Video path: ${vidPath}`);
+    //      ffmpegArgs.push(vidPath);
+    //      console.log(`ffmpeg args: ${ffmpegArgs}`);
+    //      spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+    //      spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
+    //      spw.stderr.on('data', function(data) {console.error(`ffmpeg stderr: ${data}`)});
+    //      spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
+    //      console.log('Attached spw output handlers');
+    //    },
+    //    specDone: function() {
+    //      console.log('Killing spw');
+    //      let success = spw.kill();
+    //      console.log(`Killing was successful: ${success}`);
+    //    },
+    //  });
+    //}
 
     //jasmine.getEnv().addReporter(new VideoReporter({
     //  baseDirectory: path.resolve(__dirname, '../../../protractor-video'),

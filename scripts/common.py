@@ -91,6 +91,8 @@ RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
+PROTRACTOR_VIDEOS_DIR = os.path.abspath(
+    os.path.join(CURR_DIR, os.pardir, 'protractor-video'))
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
@@ -1018,4 +1020,16 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         stack.enter_context(swap_env(
             'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
 
+        yield proc
+
+
+@contextlib.contextmanager
+def managed_ffmpeg(video_name):
+    if not os.path.exists(PROTRACTOR_VIDEOS_DIR):
+        os.makedirs(PROTRACTOR_VIDEOS_DIR)
+    tokens = [
+        'ffmpeg', '-r', '30', '-f', 'x11grab', '-s', '1280x1024', '-i',
+        os.env['DISPLAY'],
+        os.path.join(PROTRACTOR_VIDEOS_DIR, video_name)]
+    with managed_process(tokens, shell=True) as proc:
         yield proc
