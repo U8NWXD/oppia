@@ -1030,7 +1030,7 @@ def managed_ffmpeg(video_name):
     if 'CIRCLECI' in os.environ:
         screen_size = '1280x1024'
     elif 'GITHUB_ACTIONS' in os.environ:
-        screen_size = '640x480'
+        screen_size = '1280x1024'
     else:
         # TODO: Abort because not running on CI
         pass
