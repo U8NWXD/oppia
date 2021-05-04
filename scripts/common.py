@@ -1027,8 +1027,15 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
 def managed_ffmpeg(video_name):
     if not os.path.exists(PROTRACTOR_VIDEOS_DIR):
         os.makedirs(PROTRACTOR_VIDEOS_DIR)
+    if 'CIRCLECI' in os.environ:
+        screen_size = '1280x1024'
+    elif 'GITHUB_ACTIONS' in os.environ:
+        screen_size = '640x480'
+    else:
+        # TODO: Abort because not running on CI
+        pass
     tokens = [
-        'ffmpeg', '-r', '30', '-f', 'x11grab', '-s', '1280x1024', '-i',
+        'ffmpeg', '-r', '30', '-f', 'x11grab', '-s', screen_size, '-i',
         os.environ['DISPLAY'],
         os.path.join(PROTRACTOR_VIDEOS_DIR, video_name)]
     with managed_process(tokens, shell=True) as proc:
