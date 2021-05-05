@@ -41,6 +41,14 @@ var _selectLanguage = async function(language) {
   await waitFor.pageToFullyLoad();
 };
 
+var _printLogs = async function() {
+  // TODO: Remove. This checks what logs are present at the start.
+  const browserLogs = await browser.manage().logs().get('browser');
+  const browserErrors = browserLogs.filter(logEntry => (
+    logEntry.level.value > 900));
+  console.log(browserErrors);
+}
+
 
 describe('Basic user journeys', function() {
   describe('Account creation', function() {
@@ -61,16 +69,14 @@ describe('Basic user journeys', function() {
       await browser.get(general.MODERATOR_URL_SUFFIX);
       await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
+      await _printLogs();
+      await _printLogs();
       await users.logout();
     });
 
     it('should create moderators', async function() {
-      // TODO: Remove. This checks what logs are present at the start.
-      const browserLogs = await browser.manage().logs().get('browser');
-      const browserErrors = browserLogs.filter(logEntry => (
-        logEntry.level.value > 900));
-      console.log(browserErrors);
-
+      await _printLogs();
+      await _printLogs();
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
 
