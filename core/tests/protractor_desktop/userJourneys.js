@@ -68,7 +68,7 @@ describe('Basic user journeys', function() {
       // TODO: Remove. This checks what logs are present at the start.
       const browserLogs = await browser.manage().logs().get('browser');
       const browserErrors = browserLogs.filter(logEntry => (
-        logEntry.level.value > CONSOLE_LOG_THRESHOLD));
+        logEntry.level.value > 900));
       console.log(browserErrors);
 
       await users.createModerator(
