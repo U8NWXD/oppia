@@ -65,6 +65,12 @@ describe('Basic user journeys', function() {
     });
 
     it('should create moderators', async function() {
+      // TODO: Remove. This checks what logs are present at the start.
+      const browserLogs = await browser.manage().logs().get('browser');
+      const browserErrors = browserLogs.filter(logEntry => (
+        logEntry.level.value > CONSOLE_LOG_THRESHOLD));
+      console.log(browserErrors);
+
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
 
