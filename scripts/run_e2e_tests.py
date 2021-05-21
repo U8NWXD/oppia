@@ -30,7 +30,7 @@ from scripts import flake_checker
 from scripts import install_third_party_libs
 from scripts import servers
 
-MAX_RETRY_COUNT = 3
+MAX_RETRY_COUNT = 1
 RERUN_NON_FLAKY = True
 
 OPPIA_SERVER_PORT = 8181
