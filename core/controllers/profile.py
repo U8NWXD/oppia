@@ -199,6 +199,7 @@ class PreferencesHandler(base.BaseHandler):
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
+            'user_experience': user_settings.user_experience,
             'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': (
                 user_email_preferences.can_receive_email_updates),
@@ -225,6 +226,13 @@ class PreferencesHandler(base.BaseHandler):
                     % feconf.MAX_BIO_LENGTH_IN_CHARS)
             else:
                 user_services.update_user_bio(self.user_id, data)
+        elif update_type == 'user_experience':
+            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+                raise self.InvalidInputException(
+                    'User experience exceeds maximum character limit: %s'
+                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
+            else:
+                user_services.update_user_experience(self.user_id, data)
         elif update_type == 'subject_interests':
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':

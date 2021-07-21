@@ -34,6 +34,7 @@ export interface PreferencesBackendDict {
   'profile_picture_data_url': string;
   'default_dashboard': string;
   'user_bio': string;
+  'user_experience': string;
   'subject_interests': string;
   'can_receive_email_updates': boolean;
   'can_receive_editor_role_email': boolean;

@@ -63,6 +63,9 @@ class UserSettingsModel(base_models.BaseModel):
     display_alias = datastore_services.StringProperty(default=None)
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
+    # User specified experience description.
+    user_experience = datastore_services.TextProperty(
+        indexed=False, default='')
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = (
         datastore_services.TextProperty(default=None, indexed=False))
@@ -165,6 +168,7 @@ class UserSettingsModel(base_models.BaseModel):
             'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
             'display_alias': base_models.EXPORT_POLICY.EXPORTED,
             'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+            'user_experience': base_models.EXPORT_POLICY.EXPORTED,
             'profile_picture_data_url':
                 base_models.EXPORT_POLICY.EXPORTED,
             'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
@@ -272,6 +276,7 @@ class UserSettingsModel(base_models.BaseModel):
             'creator_dashboard_display_pref': (
                 user.creator_dashboard_display_pref),
             'user_bio': user.user_bio,
+            'user_experience': user.user_experience,
             'subject_interests': user.subject_interests,
             'first_contribution_msec': user.first_contribution_msec,
             'preferred_language_codes': user.preferred_language_codes,

@@ -55,6 +55,7 @@ class UserSettings(python_utils.OBJECT):
             a dataURI string.
         default_dashboard: str or None. The default dashboard of the user.
         user_bio: str. User-specified biography.
+        user_experience: str. User-specified experience description.
         subject_interests: list(str) or None. Subject interests specified by
             the user.
         first_contribution_msec: float or None. The time in milliseconds when
@@ -77,7 +78,7 @@ class UserSettings(python_utils.OBJECT):
             profile_picture_data_url=None, default_dashboard=None,
             creator_dashboard_display_pref=(
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
-            user_bio='', subject_interests=None, first_contribution_msec=None,
+            user_bio='', user_experience='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
             preferred_audio_language_code=None, pin=None, display_alias=None,
             deleted=False, created_on=None):
@@ -106,6 +107,7 @@ class UserSettings(python_utils.OBJECT):
             creator_dashboard_display_pref: str. The creator dashboard of the
                 user.
             user_bio: str. User-specified biography.
+            user_experience: str. User-specified experience description.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.
             first_contribution_msec: float or None. The time in milliseconds
@@ -140,6 +142,7 @@ class UserSettings(python_utils.OBJECT):
         self.default_dashboard = default_dashboard
         self.creator_dashboard_display_pref = creator_dashboard_display_pref
         self.user_bio = user_bio
+        self.user_experience = user_experience
         self.subject_interests = (
             subject_interests if subject_interests else [])
         self.first_contribution_msec = first_contribution_msec
@@ -293,6 +296,7 @@ class UserSettings(python_utils.OBJECT):
             'creator_dashboard_display_pref': (
                 self.creator_dashboard_display_pref),
             'user_bio': self.user_bio,
+            'user_experience': self.user_experience,
             'subject_interests': self.subject_interests,
             'first_contribution_msec': self.first_contribution_msec,
             'preferred_language_codes': self.preferred_language_codes,

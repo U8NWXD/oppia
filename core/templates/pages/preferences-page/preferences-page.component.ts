@@ -51,6 +51,7 @@ export class PreferencesPageComponent {
   AUDIO_LANGUAGE_CHOICES;
   hasPageLoaded: boolean;
   userBio: string;
+  userExperience: string = '';
   defaultDashboard: string;
   canReceiveEmailUpdates: boolean;
   canReceiveEditorRoleEmail: boolean;
@@ -102,6 +103,10 @@ export class PreferencesPageComponent {
 
   registerBioChanged(): void {
     this.preventPageUnloadEventService.addListener();
+  }
+
+  saveUserExperience(userExperience: string): void {
+    this._saveDataItem('user_experience', userExperience);
   }
 
   onSubjectInterestsSelectionChange(subjectInterests: string): void {
@@ -202,6 +207,7 @@ export class PreferencesPageComponent {
 
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
+      this.userExperience = data.user_experience;
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
       this.profilePictureDataUrl = decodeURIComponent(

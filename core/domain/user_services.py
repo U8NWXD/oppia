@@ -640,6 +640,7 @@ def _get_user_settings_from_model(user_settings_model):
         creator_dashboard_display_pref=(
             user_settings_model.creator_dashboard_display_pref),
         user_bio=user_settings_model.user_bio,
+        user_experience=user_settings_model.user_experience,
         subject_interests=user_settings_model.subject_interests,
         first_contribution_msec=(
             user_settings_model.first_contribution_msec),
@@ -1095,6 +1096,18 @@ def update_user_bio(user_id, user_bio):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_user_experience(user_id, user_experience):
+    """Updates user_experience of user with given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        user_experience: str. New user experience to be set.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.user_experience = user_experience
     _save_user_settings(user_settings)
 
 
