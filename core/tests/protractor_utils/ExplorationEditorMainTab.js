@@ -505,7 +505,7 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     if (expectFadeIn) {
       await waitFor.fadeInToComplete(
-        fadeIn, 'Editor taking long to fade in', 2000);
+        fadeIn, 'Editor taking long to fade in', 10000);
     }
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
