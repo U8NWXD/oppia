@@ -55,7 +55,6 @@ var ExplorationEditorMainTab = function() {
   };
   var feedbackBubble = element(by.css('.e2e-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.e2e-test-open-feedback-editor'));
-  var fadeIn = element(by.css('.e2e-test-editor-cards-container'));
   var interaction = element(by.css('.e2e-test-interaction'));
   var interactionEditor = element(
     by.css('.e2e-test-interaction-editor'));
@@ -504,8 +503,7 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
-      await waitFor.fadeInToComplete(
-        fadeIn, 'Editor taking long to fade in', 10000);
+      await browser.sleep(5000);
     }
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
